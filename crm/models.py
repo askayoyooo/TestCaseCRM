@@ -52,9 +52,27 @@ class Role(models.Model):
     Tester, TestLeader, TeamLeader
     """
     name = models.CharField(max_length=32, unique=True)
+    menu = models.ManyToManyField("Menu", blank=True)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name_plural = "Role"
+
+
+class Menu(models.Model):
+    """
+    角色菜单表
+    """
+    name = models.CharField(max_length=32)
+    url_name = models.CharField(max_length=64)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Menu"
 
 
 class TestCase(models.Model):

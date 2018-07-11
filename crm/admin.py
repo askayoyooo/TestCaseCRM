@@ -17,6 +17,7 @@ admin.site.register(models.Project)
 admin.site.register(models.ControlTable)
 admin.site.register(models.Issue)
 admin.site.register(models.TestResult)
+admin.site.register(models.Menu)
 
 
 

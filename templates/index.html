@@ -32,7 +32,7 @@
                 <ul class="nav nav-sidebar">
                     {% for role in request.user.userprofile.role.all %}
                         {% for menu in role.menu.all %}
-                            <li class=""><a href="{{ menu.url_name }}">{{ menu.name }}</a></li>
+                            <li class=""><a href="{%  url menu.url_name %}">{{ menu.name }}</a></li>
                         {% endfor %}
                     {% endfor %}
                 </ul>

@@ -51,6 +51,10 @@ class TestResultAdmin(admin.ModelAdmin):
     list_display = ('project', 'control_table', 'tester', 'test_case', 'test_result', 'issue_id')
 
 
+class PersonalTaskAdmin(admin.ModelAdmin):
+    list_display = ('tester', )
+
+
 admin.site.register(models.UserProfile, UserProfileAdmin)
 admin.site.register(models.Role, RoleAdmin)
 admin.site.register(models.Team, TeamAdmin)
@@ -62,6 +66,7 @@ admin.site.register(models.Issue, IssueAdmin)
 admin.site.register(models.TestResult, TestResultAdmin)
 admin.site.register(models.Menu, MenuAdmin)
 admin.site.register(models.Sheet, SheetAdmin)
+admin.site.register(models.PersonalTask, PersonalTaskAdmin)
 
 
 

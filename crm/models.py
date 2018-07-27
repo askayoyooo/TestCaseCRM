@@ -144,6 +144,20 @@ class ControlTable(models.Model):
         verbose_name_plural = "Control Table"
 
 
+class PersonalTask(models.Model):
+    """记录个人任务表"""
+    tester = models.ForeignKey("UserProfile", on_delete=models.CASCADE, default="")
+    control_table = models.ForeignKey("ControlTable", on_delete=models.CASCADE, default="" )
+    sheet = models.ManyToManyField("Sheet", blank=True)
+
+    def __str__(self):
+        return str(self.tester)+str(self.sheet)
+
+    class Meta:
+        unique_together = ('tester', 'control_table')
+        verbose_name_plural = "Personal Task"
+
+
 class Issue(models.Model):
     """
         Issue表

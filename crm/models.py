@@ -135,6 +135,7 @@ class ControlTable(models.Model):
     project_name = models.ForeignKey("Project", on_delete=models.CASCADE, default="")
     function = models.ManyToManyField("Function", blank=True)
     sheet = models.ManyToManyField("Sheet", blank=True)
+    tester = models.ManyToManyField("UserProfile", blank=True)
 
     def __str__(self):
         return str(self.control_table)

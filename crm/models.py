@@ -39,8 +39,7 @@ class Team(models.Model):
             Tester
     """
     name = models.CharField(max_length=32, blank=True, null=True)
-    Team_number = models.CharField(max_length=32, blank=True, null=True)
-    Team_leader = models.ForeignKey("UserProfile", on_delete=models.CASCADE, blank=True, null=True)
+    team_leader = models.ForeignKey("UserProfile", on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -69,6 +68,7 @@ class Menu(models.Model):
     url_name = models.CharField(max_length=64)
 
     def __str__(self):
+
         return self.name
 
     class Meta:
@@ -83,20 +83,13 @@ class TestCase(models.Model):
     case_id = models.CharField(max_length=64, unique=True)
     case_name = models.CharField(max_length=256, blank=True, null=True)
     function = models.ForeignKey("Function", on_delete=models.CASCADE, default="")
-    procedure = models.CharField(max_length=2048, blank=True, null=True)
-    pass_criteria = models.CharField(max_length=2048, blank=True, null=True)
+    sheet = models.ForeignKey("Sheet", on_delete=models.CASCADE, default="")
+    procedure = models.TextField(max_length=4096, blank=True, null=True)
+    pass_criteria = models.TextField(max_length=4096, blank=True, null=True)
     test_plan_pic_path = models.CharField(max_length=256, blank=True, null=True)
 
     def __str__(self):
-        return self.case_name
-
-
-class Function(models.Model):
-    """Functions Table"""
-    function = models.CharField(max_length=64, blank=True, null=True)
-
-    def __str__(self):
-        return self.function
+        return str(self.sheet) + "_" + str(self.case_name)
 
 
 class Project(models.Model):
@@ -119,16 +112,34 @@ class Project(models.Model):
         return self.project_name
 
 
-class ControlTable(models.Model):
-    """Control Table """
-    project_name = models.ForeignKey("Project", on_delete=models.CASCADE, default="")
-    function = models.ForeignKey("Function", on_delete=models.CASCADE, default="")
+class Function(models.Model):
+    """Functions Table"""
+    function = models.CharField(max_length=64, blank=True, null=True)
 
     def __str__(self):
-        return self.project_name
+
+        return self.function
+
+
+class Sheet(models.Model):
+    """Functions Table"""
+    sheet = models.CharField(max_length=64, blank=True, null=True)
+
+    def __str__(self):
+        return self.sheet
+
+
+class ControlTable(models.Model):
+    """Control Table """
+    control_table = models.CharField(max_length=64, unique=True, verbose_name="Task Name")
+    project_name = models.ForeignKey("Project", on_delete=models.CASCADE, default="")
+    function = models.ManyToManyField("Function", blank=True)
+    sheet = models.ManyToManyField("Sheet", blank=True)
+
+    def __str__(self):
+        return str(self.control_table)
 
     class Meta:
-        unique_together = ('project_name', 'function')
         verbose_name_plural = "Control Table"
 
 
@@ -140,6 +151,7 @@ class Issue(models.Model):
             Tester
             TestLeader
     """
+    project = models.ForeignKey('Project', on_delete=models.CASCADE, default="")
     issue_id = models.IntegerField(auto_created=True)
     bugzilla_id = models.CharField(max_length=32, blank=True, null=True)
     category_choices = (
@@ -213,7 +225,7 @@ class Issue(models.Model):
         (58, '[ME]Others'),
     )
     attribute = models.SmallIntegerField(choices=attribute_choices, verbose_name='attribute')
-    attribute_name = models.CharField(max_length=32, blank=True, null=True, verbose_name='ex. Intel, AMI')
+    attribute_name = models.CharField(max_length=32, blank=True, null=True, verbose_name='manufacturer')
     severity_choices = (
         (0, '1'),
         (1, '2'),
@@ -243,11 +255,11 @@ class Issue(models.Model):
         (6, 'Duplicated'),
         (7, 'Cannot Duplicated'),
     )
-    solving_type = models.SmallIntegerField(choices=solving_type_choices)
+    solving_type = models.SmallIntegerField(choices=solving_type_choices, blank=True, null=True)
     open_date = models.DateField()
-    verify_date = models.DateField()
-    close_date = models.DateField()
-    Owner = models.CharField(max_length=64, blank=True, null=True)
+    verify_date = models.DateField(blank=True, null=True)
+    close_date = models.DateField(blank=True, null=True)
+    owner = models.CharField(max_length=64, blank=True, null=True)
     motherboard_version = models.CharField(max_length=32, blank=True, null=True)
     bios_version = models.CharField(max_length=32, blank=True, null=True)
     os_version = models.CharField(max_length=64, blank=True, null=True)
@@ -255,7 +267,7 @@ class Issue(models.Model):
     submitter = models.ForeignKey("UserProfile", verbose_name='bug 提交人', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.issue_id
+        return str(self.issue_id)
 
 
 class TestResult(models.Model):
@@ -269,6 +281,7 @@ class TestResult(models.Model):
         多对多：
             Issue
     """
+    control_table = models.ForeignKey('ControlTable', on_delete=models.CASCADE, default='123')
     project = models.ForeignKey('Project', on_delete=models.CASCADE)
     tester = models.ForeignKey('UserProfile', on_delete=models.CASCADE)
     test_case = models.ForeignKey('TestCase', verbose_name='test case', on_delete=models.CASCADE)
@@ -278,10 +291,10 @@ class TestResult(models.Model):
         (2, 'N/A')
     )
     test_result = models.SmallIntegerField(choices=test_result_choice)
-    issue_id = models.ForeignKey('Issue', on_delete=models.CASCADE)
+    issue_id = models.ForeignKey('Issue', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return self.project
+        return str(self.project)
 
     class Meta:
         unique_together = ('project', 'test_case')
